@@ -9,11 +9,11 @@ contract ERC721ATR is ERC721 {
 
     bytes32 internal constant ATRTokenSalt = bytes32(uint256(keccak256("AssetTransferRightsToken")) - 1);
 
-    ATRToken public immutable atrToken;
+    ATRToken public immutable atr;
 
 
     constructor() ERC721("NFT with tokenizable transfer rights", "721ATR") {
-        atrToken = new ATRToken{ salt: ATRTokenSalt }();
+        atr = new ATRToken{ salt: ATRTokenSalt }();
     }
 
 
@@ -22,24 +22,24 @@ contract ERC721ATR is ERC721 {
     function mintTransferRights(uint256 tokenId) external {
         address owner = ownerOf(tokenId);
         require(msg.sender == owner, "Caller is not token owner");
-        atrToken.mint(owner, tokenId);
+        atr.mint(owner, tokenId);
     }
 
     function burnTransferRights(uint256 tokenId) external {
-        address owner = atrToken.ownerOf(tokenId);
+        address owner = atr.ownerOf(tokenId);
         require(msg.sender == owner, "Caller is not token owner");
-        atrToken.burn(tokenId);
+        atr.burn(tokenId);
     }
 
 
     // # updated transfer constraints
 
     function hasTransferRights(address owner, uint256 tokenId) public view returns (bool) {
-        return atrToken.ownerOf(tokenId) == owner;
+        return atr.ownerOf(tokenId) == owner;
     }
 
     function _isApprovedOrOwner(address spender, uint256 tokenId) override internal view virtual returns (bool) {
-        if (atrToken.exists(tokenId)) {
+        if (atr.exists(tokenId)) {
             return hasTransferRights(spender, tokenId);
         } else {
             address owner = ownerOf(tokenId);
